@@ -1,133 +1,48 @@
-# include "hash.c"
+#include <stdio.h>
+#include <string.h>
 
-main()
-{
- Hash tab;
- int num, elemento, op,cont = 0, conti = 0;
- FILE* arquivo;
- criarArquivo(arquivo);
- 
- while(num != 8)
- {
-  menuHash(&num);
-  switch(num)
-  {
-   case 1:
-        if(cont > 0)
-        {
-         system("cls");
-         printf("\nOs Numeros Aleatorios ja foram gerados!\n");
-        }else{
-             cont++;
-             inicializaHash(tab);
-             reescreveArquivo(arquivo);
-             numeroAleatorio();
-             mensagem();
-             } 
-        break;
-   case 2:
-        if(cont > 0)
-        {
-         conti++;
-         carregaArquivo(tab);
-         mesagem2();
-        }else{
-              mensagem3();
-             }
-        break;
-   case 3:
-        if(conti > 0)
-        {
-         system("cls");
-         lerNumero(&elemento);
-         buscaHash(tab,elemento);
-         getch();
-        }else{
-              mensagem4();
-             }
-         break;
-   case 4:
-        if(conti > 0)
-        {
-         system("cls");
-         lerNumero1(&elemento);
-         removeHash(tab,elemento);
-         getch();
-        }else{
-              mensagem4();
-             }
-        break;
-   case 5:
-        if(conti > 0)
-        {
-         system("cls");
-         imprimeHash(tab);
-        }else{
-              mensagem4();
-             }
-        getch();
-        break;
-   case 6:
-        op = -1;
-        if(conti > 0)
-        {
-         while(op != 0)
-         {
-          menuEstatistica(&op);
-          switch(op)
-          {
-           case 0:
-                 system("cls");
-                 break; 
-           case 1:
-                system("cls");
-                posicao(25,3);printf("%g%% da tabela foi preenchida!\n",porcentagemHash(tab));
-                getch();
-                break;
-           case 2:
-               system("cls");
-               indiceColisao(tab);
-               getch();
-               break;
-           case 3:
-                system("cls");
-                lerNumero2(&op);
-                imprimeColisao(tab,op);
-                getch();
-                break;
-           case 4:
-               system("cls");
-               posicao(25,3);printf("Total de colisoes = %d",quantidadeColisao(tab));
-               getch();
-               break;
-           case 5:
-               system("cls");
-               posicoesVazias(tab);
-               getch();
-               break;
-           default:
-                 system("cls");  
-                 printf("\nOpcao invalida!");
-                 getch();
-                 break;
-         }
-           system("cls");
-        }
-        }else{
-        
-             mensagem4();
-             }
-       break;
-   case 7:
-         exit(0);
-   default:
-           system("cls");
-           printf("\nOpcao invalida!\n");
-           getch();
-           break;
-   }
-   system("cls");
-  }
-  
-}
-        
+int tamanhoTabela = 10;
+
+/*Rotina que transforma uma string em um nÃºmero
+que serÃ¡ usado depois na funÃ§Ã£o hash
+*/
+int stringParaInt(char *string) {
+    int tamanho, primeira, segunda; //Inteiros que representam o tamanho,
+                                    //o cÃ³digo da primeira letra da string
+                                    //e o cÃ³digo da segunda letra.
+    tamanho =  strlen(string);      //Mede o tamanho da string
+    primeira = string[0];           //ObtÃ©m o cÃ³digo da primeira letra
+    segunda = string[1];            //ObtÃ©m o cÃ³digo da segunda letra
+    int resultado = (tamanho * primeira) + segunda; //FunÃ§Ã£o de transformaÃ§Ã£o
+    return resultado;  //Retorna nÃºmero que representa a string
+    }
+
+/*A funÃ§Ã£o mais simples de hash;
+Para uma tabela com n posiÃ§Ãµes (n == tamanhoTabela)
+Toma-se o mÃ³dulo n do valor inteiro gerado na
+funÃ§Ã£o "stringParaInt"
+RetornarÃ¡ um nÃºmero entre 0 e 19.
+*/
+int hash(int valor) {
+    return valor % tamanhoTabela;  
+    }
+
+
+/*Rotina principal
+Captura strings quaisquer e gera a chave correspondente para tabela hash.
+*/
+int main() {
+    int i;
+    char dado[50];
+
+    printf("\nDefina o tamanho da tabela: ");
+    scanf("%d", &tamanhoTabela);
+
+    for (i=0; i<tamanhoTabela; i++) {
+   
+    printf("\nDigite uma palavra qualquer: ");
+    gets(dado);
+
+    printf("A chave para a tabela (de 0 a %d) Ã©: %d", tamanhoTabela-1, hash(stringParaInt(dado)));
+    }
+
