@@ -1,40 +1,108 @@
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 
-int tamanhoTabela = 10;
+// constante repesenta o tamanho da tabela
+#define M 19
 
+// estrutura Pessoa com nome e uma matrícula
+typedef struct{
+    int matricula;
+    char nome[50];
+}Pessoa;
 
-int stringParaInt(char *string) {
-    int tamanho, primeira, segunda; 
-                                 
-    tamanho =  strlen(string);      
-    primeira = string[0];           
-    segunda = string[1];            
-    int resultado = (tamanho * primeira) + segunda;
-    return resultado;  //Retorna nÃºmero que representa a string
-    }
+// nossa tabela hash do tipo Pessoa
+Pessoa tabelaHash[M];
 
-
-int hash(int valor) {
-    return valor % tamanhoTabela;  
-    }
-
-
-/*Rotina principal
-Captura strings quaisquer e gera a chave correspondente para tabela hash.
-*/
-int main() {
+// inicializa nossa tabela com o valor de codigo -1
+void inicializarTabela(){
     int i;
-    char dado[50];
+    for(i = 0; i < M; i++)
+        tabelaHash[i].matricula = -1;
+}
 
-    printf("\nDefina o tamanho da tabela: ");
-    scanf("%d", &tamanhoTabela);
+// função de espalhamento (resto da divisão da chave por M)
+int gerarCodigoHash(int chave){
+    return chave % M;
+}
 
-    for (i=0; i<tamanhoTabela; i++) {
-   
-    printf("\nDigite uma palavra qualquer: ");
-    gets(dado);
+// função para ler e retornar uma pessoa
+Pessoa lerPessoa(){
+    Pessoa p;
+    printf("Digite a matricula: ");
+    scanf("%d", &p.matricula);
+    scanf("%*c");
+    printf("Digite o nome: ");
+    fgets(p.nome, 50, stdin);
+    return p;
+}
 
-    printf("A chave para a tabela (de 0 a %d): %d", tamanhoTabela-1, hash(stringParaInt(dado)));
+// inserir uma pessoa na tabela
+void inserir(){
+    Pessoa pes = lerPessoa();
+    int indice = gerarCodigoHash(pes.matricula);
+    while(tabelaHash[indice].matricula != -1)
+        indice = gerarCodigoHash(indice + 1);
+    tabelaHash[indice] = pes;
+}
+
+Pessoa* buscar(int chave){
+    int indice = gerarCodigoHash(chave);
+    while(tabelaHash[indice].matricula != -1){
+        if(tabelaHash[indice].matricula == chave)
+            return &tabelaHash[indice];
+        else
+            indice = gerarCodigoHash(indice + 1);
     }
+    return NULL;
+}
 
+void imprimir(){
+    int i;
+    printf("\n------------------------TABELA---------------------------\n");
+    for(i = 0; i < M; i++){
+        if(tabelaHash[i].matricula != -1)
+            printf("%2d = %3d \t %s", i, tabelaHash[i].matricula, tabelaHash[i].nome);
+        else
+            printf("%2d =\n", i);
+    }
+    printf("\n----------------------------------------------------------\n");
+}
+
+int main() {
+    int op, chave;
+    Pessoa *p;
+
+    inicializarTabela();
+
+    do{
+        printf("1 - Inserir\n2 - Buscar\n3 - Imprimir\n0 - Sair\n");
+        scanf("%d", &op);
+
+        switch(op){
+        case 0:
+            printf("Saindo...\n");
+            break;
+        case 1:
+            inserir();
+            break;
+        case 2:
+            printf("Digite a matricula a ser buscada: ");
+            scanf("%d", &chave);
+            p = buscar(chave);
+
+            if(p)
+                printf("\n\tMatricula: %d \tNome: %s\n", p->matricula, p->nome);
+            else
+                printf("\nMatricula nao encontrada!\n");
+            break;
+        case 3:
+            imprimir();
+            break;
+        default:
+            printf("Opcao invalida!\n");
+        }
+
+    }while(op != 0);
+
+    return 0;
+}
